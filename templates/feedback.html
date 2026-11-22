@@ -3,21 +3,43 @@
 {% block content %}
 <h1 class="mb-4 text-3xl font-bold">Зворотний зв'язок</h1>
 
-<form id="feedbackForm" class="mx-auto max-w-lg">
-    <div class="mb-4">
-        <label for="name" class="mb-2 block text-sm font-bold text-gray-700">Ім'я:</label>
-        <input type="text" id="name" name="name" required class="w-full rounded-md border border-gray-300 px-3 py-2">
+<form id="feedbackForm" class="space-y-4">
+
+    <div>
+        <label>Ім'я</label>
+        <input name="name"
+               maxlength="100"
+               required
+               class="block w-full rounded-lg border border-line bg-white p-2">
+
+        <p data-error="name" class="text-red-700"></p>
     </div>
-    <div class="mb-4">
-        <label for="email" class="mb-2 block text-sm font-bold text-gray-700">Email:</label>
-        <input type="email" id="email" name="email" required class="w-full rounded-md border border-gray-300 px-3 py-2">
+
+    <div>
+        <label>Email</label>
+        <input name="email"
+               type="email"
+               required
+               class="block w-full rounded-lg border border-line bg-white p-2">
+
+        <p data-error="email" class="text-red-700"></p>
     </div>
-    <div class="mb-6">
-        <label for="message" class="mb-2 block text-sm font-bold text-gray-700">Повідомлення:</label>
-        <textarea id="message" name="message" required class="h-32 w-full rounded-md border border-gray-300 px-3 py-2"></textarea>
+
+    <div>
+        <label>Повідомлення</label>
+        <textarea name="message"
+                  maxlength="2000"
+                  required
+                  class="block w-full rounded-lg border border-line bg-white p-2"></textarea>
+
+        <p data-error="message" class="text-red-700"></p>
     </div>
-    <p id="formError" class="mb-4 hidden rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-800" role="alert"></p>
-    <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700">Надіслати</button>
+
+    <button type="submit"
+            class="rounded-lg bg-accent px-5 py-2 text-white">
+        Надіслати
+    </button>
+
 </form>
 
 <!-- Модальне вікно -->
@@ -63,4 +85,8 @@
 
     document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
 </script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
 {% endblock %}
