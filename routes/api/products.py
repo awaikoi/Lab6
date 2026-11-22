@@ -8,6 +8,9 @@ from .errors import ApiError
 from .helpers import product_filters_from_request, product_to_dict
 from .validation import get_json_body, validate_fields
 
+from flask import request
+from .helpers import read_uploaded_image
+
 PRODUCT_RULES = {
     'name': {'type': str, 'required': True, 'max_len': 100},
     'price': {'type': (int, float), 'required': True, 'min': 0},
@@ -208,3 +211,56 @@ def delete_product(product_id):
     except sqlite3.IntegrityError:
         raise ApiError('Не можна видалити товар, який є в замовленнях', 409)
     return '', 204
+
+@api_v1.route(
+    '/products/<int:product_id>/image',
+    methods=['POST']
+)
+def upload_product_image(product_id):
+    """Завантажити зображення товару
+    ---
+    tags: [Products]
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: product_id
+        in: path
+        type: integer
+        required: true
+      - name: image_file
+        in: formData
+        type: file
+        required: true
+    responses:
+      200:
+        description: Зображення завантажено
+      400:
+        description: Неправильний формат
+      404:
+        description: Товар не знайдено
+      413:
+        description: Файл завеликий
+    """
+
+    product = _get_or_404(product_id)
+
+    uploaded = request.files.get('image_file')
+
+    image_data, image_mimetype = read_uploaded_image(
+        uploaded
+    )
+
+    models.update_product(
+        product_id,
+        product['name'],
+        product['price'],
+        image=product['image'] or '',
+        image_data=image_data,
+        image_mimetype=image_mimetype,
+        discount_percent=product['discount_percent'],
+        category_id=product['category_id'],
+    )
+
+    return jsonify(
+        product_to_dict(models.get_product(product_id))
+    ), 200

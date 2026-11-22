@@ -7,51 +7,6 @@ import models
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-MAX_IMAGE_SIZE = 5 * 1024 * 1024
-ALLOWED_IMAGE_TYPES = {
-    'image/jpeg': (b'\\xff\\xd8\\xff',),
-    'image/png': (b'\\x89PNG\\r\\n\\x1a\\n',),
-    'image/gif': (b'GIF87a', b'GIF89a'),
-    'image/webp': (b'RIFF',),  # додаткова перевірка WEBP нижче
-}
-
-
-
-def read_uploaded_image():
-    """Перевіряє завантажене зображення та повертає його дані."""
-
-    uploaded = request.files.get('image_file')
-
-    if uploaded is None or not uploaded.filename:
-        return None, None, None
-
-    data = uploaded.read(MAX_IMAGE_SIZE + 1)
-
-    if len(data) > MAX_IMAGE_SIZE:
-        return None, None, 'Зображення має бути не більше 5 МБ.'
-
-    # Визначаємо формат за справжньою сигнатурою файлу
-    if data.startswith(b'\xff\xd8\xff'):
-        mimetype = 'image/jpeg'
-
-    elif data.startswith(b'\x89PNG\r\n\x1a\n'):
-        mimetype = 'image/png'
-
-    elif data.startswith((b'GIF87a', b'GIF89a')):
-        mimetype = 'image/gif'
-
-    elif len(data) >= 12 and data[:4] == b'RIFF' and data[8:12] == b'WEBP':
-        mimetype = 'image/webp'
-
-    else:
-        return None, None, 'Дозволені лише справжні зображення JPG, PNG, GIF або WEBP.'
-
-    return data, mimetype, None
-
-@admin_bp.errorhandler(413)
-def request_entity_too_large(error):
-    flash('Файл завеликий. Максимальний розмір зображення — 5 МБ.', 'error')
-    return redirect(url_for('admin.products'))
 
 # ------------------------------------------------- замовлення та відгуки
 
@@ -100,101 +55,31 @@ def delete_feedback(feedback_id):
 
 # ------------------------------------------------------------- товари
 
-def read_product_form():
-    """Читає й перевіряє форму товару. Повертає (дані, помилка)."""
-    name = request.form.get('name', '').strip()
-    image = request.form.get('image', '').strip()
-    try:
-        price = round(float(request.form.get('price', '').replace(',', '.')), 2)
-    except ValueError:
-        return None, 'Ціна має бути числом.'
-    if not name:
-        return None, 'Вкажіть назву товару.'
-    if price < 0:
-        return None, 'Ціна не може бути від\'ємною.'
-    try:
-        discount_percent = round(float(request.form.get('discount_percent', '0').replace(',', '.')), 2)
-    except ValueError:
-        return None, 'Знижка має бути числом.'
-    if discount_percent < 0 or discount_percent > 100:
-        return None, 'Знижка має бути в межах від 0 до 100%.'
-    try:
-        category_id = int(request.form.get('category_id')) if request.form.get('category_id') else None
-    except ValueError:
-        category_id = None
-    if category_id is not None and models.get_category(category_id) is None:
-        return None, 'Невідома категорія.'
-    image_data, image_mimetype, image_error = read_uploaded_image()
-    if image_error:
-        return None, image_error
-    return {
-        'name': name,
-        'price': price,
-        'image': image,
-        'image_data': image_data,
-        'image_mimetype': image_mimetype,
-        'discount_percent': discount_percent,
-        'category_id': category_id,
-    }, None
-
 
 @admin_bp.route('/products')
 def products():
-    return render_template(
-        'admin_products.html',
-        products=models.get_products(),
-        categories=models.get_categories(),
-    )
+    return render_template('admin_products.html')
 
 
-@admin_bp.route('/products/new', methods=['GET', 'POST'])
+@admin_bp.route('/products/new')
 def new_product():
-    if request.method == 'POST':
-        data, error = read_product_form()
-        if error is None:
-            models.add_product(**data)
-            flash(f'Товар «{data["name"]}» додано.', 'success')
-            return redirect(url_for('admin.products'))
-        flash(error, 'error')
     return render_template(
         'product_form.html',
-        product=request.form.to_dict(),
-        categories=models.get_category_tree(),
         is_new=True,
+        product_id=None,
     )
 
 
-@admin_bp.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
+@admin_bp.route('/products/<int:product_id>/edit')
 def edit_product(product_id):
-    product = models.get_product(product_id)
-    if product is None:
+    if models.get_product(product_id) is None:
         abort(404)
-    product = dict(product)
-    if request.method == 'POST':
-        data, error = read_product_form()
-        if error is None:
-            models.update_product(product_id, **data)
-            flash(f'Товар «{data["name"]}» оновлено.', 'success')
-            return redirect(url_for('admin.products'))
-        flash(error, 'error')
-        product = request.form.to_dict()  # показуємо форму з тим, що ввів користувач
+
     return render_template(
         'product_form.html',
-        product=product,
-        categories=models.get_category_tree(),
         is_new=False,
+        product_id=product_id,
     )
-
-
-@admin_bp.route('/products/<int:product_id>/delete', methods=['POST'])
-def delete_product(product_id):
-    try:
-        models.delete_product(product_id)
-        flash('Товар видалено.', 'success')
-    except sqlite3.IntegrityError:
-        # Спрацював зовнішній ключ: товар є в існуючих замовленнях
-        flash('Не можна видалити товар, який є в замовленнях.', 'error')
-    return redirect(url_for('admin.products'))
 
 
 # -------------------------------------------------------- категорії та промокоди
