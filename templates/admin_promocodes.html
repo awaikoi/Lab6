@@ -40,18 +40,6 @@
 
     <button type="submit">Створити</button>
 </form>
-{% if promocodes %}
-<div class="overflow-x-auto">
-<table class="w-full text-left text-sm"><thead><tr class="border-b border-line"><th class="p-3">Код</th><th class="p-3">Знижка</th><th class="p-3">Мін. сума</th><th class="p-3">Діє до</th><th class="p-3">Статус</th><th></th></tr></thead>
-<tbody>{% for promo in promocodes %}<tr class="border-b border-line">
-<td class="p-3 font-bold">{{ promo.code }}</td>
-<td class="p-3">{{ promo.discount_percent }}% / {{ promo.discount_amount|money }}</td>
-<td class="p-3">{{ promo.min_order|money }}</td>
-<td class="p-3">{{ promo.expires_at or 'Безстроково' }}</td>
-<td class="p-3">{{ 'Активний' if promo.active else 'Неактивний' }}</td>
-<td class="p-3"><form method="post" action="{{ url_for('admin.delete_promocode', promo_id=promo.id)}}" onsubmit="return confirm('Видалити промокод?')"><button class="font-semibold text-red-800">Видалити</button></form></td>
-</tr>{% endfor %}</tbody></table></div>
-{% else %}<p class="text-ink/70">Промокодів ще немає.</p>{% endif %}
 {% endblock %}
 
 {% block scripts %}
