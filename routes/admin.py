@@ -223,30 +223,6 @@ def delete_category(category_id):
     return redirect(url_for('admin.categories'))
 
 
-@admin_bp.route('/promocodes', methods=['GET', 'POST'])
+@admin_bp.route('/promocodes')
 def promocodes():
-    if request.method == 'POST':
-        try:
-            percent = float(request.form.get('discount_percent', '0').replace(',', '.'))
-            amount = float(request.form.get('discount_amount', '0').replace(',', '.'))
-            minimum = float(request.form.get('min_order', '0').replace(',', '.'))
-            models.add_promocode(
-                request.form.get('code', ''),
-                discount_percent=percent,
-                discount_amount=amount,
-                min_order=minimum,
-                active=request.form.get('active') == '1',
-                expires_at=request.form.get('expires_at', '').strip() or None,
-            )
-            flash('Промокод створено.', 'success')
-        except (ValueError, sqlite3.IntegrityError) as error:
-            flash(str(error), 'error')
-        return redirect(url_for('admin.promocodes'))
-    return render_template('admin_promocodes.html', promocodes=models.get_promocodes())
-
-
-@admin_bp.route('/promocodes/<int:promo_id>/delete', methods=['POST'])
-def delete_promocode(promo_id):
-    models.delete_promocode(promo_id)
-    flash('Промокод видалено.', 'success')
-    return redirect(url_for('admin.promocodes'))
+    return render_template('admin_promocodes.html')
