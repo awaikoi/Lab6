@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, render_template, session
+from flask import Flask, render_template
 
 import models
 
@@ -42,16 +42,10 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(shop_bp)
 
 
-@app.template_filter('money')
-def money(value):
-    return f'{value:.2f} грн'
-
-
 @app.context_processor
 def inject_globals():
     return {
         'current_year': datetime.now().year,
-        'cart_count': sum(session.get('cart', {}).values()),
     }
 
 
@@ -64,7 +58,9 @@ def home():
 def about():
     return render_template('about.html')
 
-
+@app.route('/api-demo')
+def api_demo():
+    return render_template('api-demo.html')
 
 
 if __name__ == '__main__':

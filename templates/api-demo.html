@@ -1,0 +1,50 @@
+
+{% extends "base.html" %}
+
+{% block title %}API Demo{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-5 text-2xl font-bold">
+    API Demo
+</h1>
+
+<form id="categoryForm"
+      class="mb-6 flex flex-wrap gap-3">
+
+    <input
+        name="name"
+        required
+        minlength="2"
+        maxlength="100"
+        placeholder="Назва категорії"
+        class="rounded-lg border border-line bg-white px-3 py-2"
+    >
+
+    <select
+        name="parent_id"
+        class="rounded-lg border border-line bg-white px-3 py-2"
+    >
+        <option value="">Коренева категорія</option>
+    </select>
+
+    <button
+        type="submit"
+        class="rounded-lg bg-accent px-4 py-2 text-white"
+    >
+        Додати
+    </button>
+</form>
+
+<h2 class="mb-3 text-lg font-semibold">
+    Категорії
+</h2>
+
+<ul id="categoryList" class="space-y-2"></ul>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/api-demo.js') }}"></script>
+{% endblock %}
+
