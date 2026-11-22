@@ -10,17 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const badge = document.createElement('span');
 
         const colors = {
-            'Нове': 'bg-blue-100 text-blue-800',
-            'В обробці': 'bg-yellow-100 text-yellow-800',
-            'Відправлено': 'bg-purple-100 text-purple-800',
-            'Доставлено': 'bg-green-100 text-green-800',
+            'Нове': 'bg-sky-100 text-sky-800',
+            'В обробці': 'bg-amber-100 text-amber-800',
+            'Відправлено': 'bg-violet-100 text-violet-800',
+            'Доставлено': 'bg-emerald-100 text-emerald-800',
             'Скасовано': 'bg-red-100 text-red-800'
         };
 
         badge.textContent = status;
 
         badge.className =
-        `rounded-full px-3 py-1 text-xs font-semibold ${
+        `inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${
             colors[status] || 'bg-gray-100 text-gray-800'
         }`;
 
@@ -37,14 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
 
             card.className =
-            'rounded-xl border border-line bg-white/30 p-4';
+            'rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-sm)]';
 
             const title = document.createElement('p');
             title.textContent = label;
+            title.className = 'text-sm text-ink/55';
 
             const value = document.createElement('p');
             value.textContent = count;
-            value.className = 'text-2xl font-bold';
+            value.className = 'mt-2 text-3xl font-bold tracking-tight';
 
             card.append(title, value);
             statistics.append(card);
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             cell.colSpan = 6;
             cell.textContent = 'Замовлень не знайдено.';
-            cell.className = 'p-5 text-center';
+            cell.className = 'px-4 py-10 text-center text-ink/55';
 
             row.append(cell);
             orders.append(row);
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(order => {
             const row = document.createElement('tr');
 
-            row.className = 'border-b border-line';
+            row.className = 'border-b border-line last:border-0';
 
             const values = [
                 order.id,
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             values.forEach((value, index) => {
                 const cell = document.createElement('td');
 
-                cell.className = 'p-3';
+                cell.className = 'px-4 py-3.5';
 
                 if (index === 3) {
                     cell.append(makeStatusBadge(order.status));
@@ -102,18 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const actions = document.createElement('td');
-            actions.className = 'flex flex-wrap gap-2 p-3';
+            actions.className = 'px-4 py-3.5';
 
             const details = document.createElement('a');
 
             details.href = `/admin/order/${order.id}`;
             details.textContent = 'Деталі';
-            details.className = 'text-accent underline';
+            details.className = 'mr-3 rounded-lg border border-line px-3 py-1.5 text-xs font-bold text-accent transition hover:bg-[#fff7f9]';
 
             const remove = document.createElement('button');
 
             remove.textContent = 'Видалити';
-            remove.className = 'text-red-700 underline';
+            remove.className = 'rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-50';
 
             remove.onclick = async () => {
                 if (!confirm(
@@ -158,14 +159,18 @@ document.addEventListener('DOMContentLoaded', () => {
         feedback.replaceChildren();
 
         if (!data.length) {
-            feedback.textContent = 'Відгуків поки немає.';
+            const empty = document.createElement('p');
+            empty.textContent = 'Відгуків поки немає.';
+            empty.className =
+                'rounded-2xl border border-dashed border-line bg-surface/50 px-5 py-10 text-center text-sm text-ink/55 lg:col-span-2';
+            feedback.append(empty);
         }
 
         data.forEach(item => {
             const card = document.createElement('article');
 
             card.className =
-            'rounded-xl border border-line bg-white/30 p-4';
+            'rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-sm)]';
 
             const name = document.createElement('h3');
 
@@ -175,12 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.createElement('p');
 
             email.textContent = item.email;
-            email.className = 'text-sm text-accent';
+            email.className = 'mt-1 text-sm text-accent';
 
             const message = document.createElement('p');
 
             message.textContent = item.message;
-            message.className = 'my-3 whitespace-pre-wrap';
+            message.className = 'my-4 whitespace-pre-wrap leading-6 text-ink/80';
 
             const date = document.createElement('p');
 
@@ -190,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const remove = document.createElement('button');
 
             remove.textContent = 'Видалити';
-            remove.className = 'mt-3 text-red-700 underline';
+            remove.className = 'mt-4 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-50';
 
             remove.onclick = async () => {
                 if (!confirm('Видалити відгук?')) return;
@@ -249,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const message = document.createElement('p');
         message.textContent = error.message;
+        message.className = 'text-sm text-red-700';
 
         const button = document.createElement('button');
 

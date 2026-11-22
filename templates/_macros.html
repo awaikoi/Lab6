@@ -44,7 +44,7 @@
         }
     ] %}
 
-    <nav class="mb-8 flex flex-wrap items-center gap-2 border-b border-gray-200 pb-3"
+    <nav class="mb-7 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-surface p-2"
          aria-label="Навігація адміністратора">
 
         {% for item in navigation_items %}
@@ -54,7 +54,7 @@
                {% if is_active %}aria-current="page"{% endif %}
                class="rounded-lg px-4 py-2 text-sm font-medium transition-colors
                       {% if is_active %}
-                          bg-white/40 text-accent
+                          bg-accent text-white shadow-sm
                       {% else %}
                           text-ink/70 hover:bg-white/30 hover:text-ink
                       {% endif %}">

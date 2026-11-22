@@ -3,9 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const lines = document.getElementById('cartLines');
     const summary = document.getElementById('summary');
     const empty = document.getElementById('emptyCart');
+    const orderSuccess = document.getElementById('orderSuccess');
+    const orderSuccessMessage = document.getElementById('orderSuccessMessage');
 
     const promoForm = document.getElementById('promoForm');
     const checkoutForm = document.getElementById('checkoutForm');
+    const cartLayout = document.getElementById('cartLayout');
 
     let products = [];
     let promo = Cart.getPromo();
@@ -41,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!products.length) {
             empty.hidden = false;
+            orderSuccess.hidden = true;
+            cartLayout.hidden = true;
             promoForm.hidden = true;
             checkoutForm.hidden = true;
             summary.textContent = '';
@@ -48,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         empty.hidden = true;
+        orderSuccess.hidden = true;
+        cartLayout.hidden = false;
         promoForm.hidden = false;
         checkoutForm.hidden = false;
 
@@ -57,9 +64,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = element('div');
 
             row.className =
-                'flex flex-wrap items-center justify-between gap-3 border-b border-line py-4';
+                'grid items-center gap-3 py-4 sm:grid-cols-[88px_1fr_120px_80px_100px]';
+
+            const image = element('img');
+            image.src = product.image_url || '';
+            image.alt = product.name;
+            image.className =
+                'h-20 w-20 rounded-xl border border-line bg-[#fff7f9] object-cover';
+            if (!product.image_url) {
+                image.classList.add('hidden');
+            }
 
             const name = element('strong', product.name);
+            name.className = 'leading-5';
 
             const price = element(
                 'span',
@@ -74,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             quantity.value = item.quantity;
 
             quantity.className =
-                'w-20 rounded border border-line px-2 py-1';
+                'w-20 rounded-xl border border-line bg-[#fbfaf8] px-3 py-2';
 
             quantity.addEventListener('change', () => {
                 Cart.set(product.id, quantity.value);
@@ -90,13 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const remove = element('button', 'Видалити');
 
-            remove.className = 'text-red-700 underline';
+            remove.className = 'justify-self-start text-sm font-semibold text-red-700 hover:underline sm:justify-self-end';
 
             remove.onclick = () => {
                 Cart.remove(product.id);
             };
 
             row.append(
+                image,
                 name,
                 price,
                 quantity,
@@ -265,19 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             promo = null;
             products = [];
-
-            lines.replaceChildren(
-                element(
-                    'h2',
-                    `Замовлення №${order.id} оформлено, сума ${order.total_price} грн`
-                )
-            );
-
+            orderSuccessMessage.textContent =
+                `Номер замовлення: ${order.id}. Сума: ${order.total_price} грн. Дякуємо за покупку!`;
+            orderSuccess.hidden = false;
             summary.textContent = '';
 
             promoForm.hidden = true;
             checkoutForm.hidden = true;
             empty.hidden = true;
+            cartLayout.hidden = true;
 
         } catch (error) {
             const details = error.details || {};

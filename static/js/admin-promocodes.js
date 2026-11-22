@@ -8,30 +8,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         list.replaceChildren();
 
+        if (!rows.length) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.textContent = 'Промокодів поки немає.';
+            cell.className = 'px-4 py-10 text-center text-ink/55';
+            row.append(cell);
+            list.append(row);
+        }
+
         rows.forEach(promo => {
             const row = document.createElement('tr');
+            row.className = 'border-b border-line last:border-0';
 
-            const values = [
-                promo.code,
-                promo.discount_percent > 0
-                    ? `${promo.discount_percent}%`
-                    : `${promo.discount_amount} грн`,
-                promo.min_order,
-                promo.expires_at || 'Безстроково',
-                promo.active ? 'Так' : 'Ні'
-            ];
+            const code = document.createElement('td');
+            code.textContent = promo.code;
+            code.className = 'px-4 py-3 font-bold';
+            row.append(code);
 
-            values.forEach(value => {
+            const discount = document.createElement('td');
+            discount.textContent = promo.discount_percent > 0
+                ? `${promo.discount_percent}%`
+                : `${promo.discount_amount} грн`;
+            discount.className = 'px-4 py-3';
+            row.append(discount);
+
+            [promo.min_order, promo.expires_at || 'Безстроково'].forEach(value => {
                 const cell = document.createElement('td');
                 cell.textContent = value;
-                cell.className = 'p-2';
+                cell.className = 'px-4 py-3';
                 row.append(cell);
             });
 
+            const active = document.createElement('td');
+            const badge = document.createElement('span');
+            badge.textContent = promo.active ? 'Так' : 'Ні';
+            badge.className = promo.active
+                ? 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800'
+                : 'rounded-full bg-gray-100 px-2.5 py-1 text-xs font-bold text-gray-600';
+            active.className = 'px-4 py-3';
+            active.append(badge);
+            row.append(active);
+
             const actions = document.createElement('td');
+            actions.className = 'px-4 py-3';
             const button = document.createElement('button');
 
             button.textContent = 'Видалити';
+            button.className =
+                'rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-50';
 
             button.onclick = async () => {
                 if (!confirm('Видалити промокод?')) return;
@@ -43,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     );
 
                     row.remove();
+                    if (!list.children.length) {
+                        await loadPromocodes();
+                    }
 
                     showToast('Промокод видалено', 'success');
 

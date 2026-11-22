@@ -20,10 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             categories.forEach(category => {
                 const item = document.createElement('li');
+                item.className =
+                    'flex items-center justify-between gap-3 px-3 py-3';
 
-                item.textContent =
-                    `${category.name} — ` +
-                    `${category.parent_name || 'Коренева'}`;
+                const name = document.createElement('span');
+                name.textContent = category.name;
+                name.className = 'font-semibold';
+
+                const parentName = document.createElement('span');
+                parentName.textContent =
+                    category.parent_name || 'Коренева категорія';
+                parentName.className =
+                    'rounded-full border border-line bg-[#fff7f9] px-3 py-1 text-xs text-ink/60';
+
+                item.append(name, parentName);
 
                 list.appendChild(item);
 

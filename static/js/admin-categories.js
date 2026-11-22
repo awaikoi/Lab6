@@ -18,13 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!response.data.length) {
             root.textContent = 'Категорій ще немає.';
+            root.className =
+                'divide-y divide-line px-4 py-10 text-center text-sm text-ink/55';
+        } else {
+            root.className = 'divide-y divide-line';
         }
 
         response.data.forEach(category => {
             const row = document.createElement('div');
 
             row.className =
-            'flex items-center justify-between rounded-lg border border-line bg-white/20 px-4 py-3';
+            'flex items-center justify-between gap-3 px-4 py-3.5';
 
             const name = document.createElement('span');
 
@@ -36,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             remove.textContent = 'Видалити';
 
             remove.className =
-            'text-sm font-semibold text-red-800';
+            'shrink-0 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-50';
 
             remove.onclick = async () => {
                 if (!confirm(

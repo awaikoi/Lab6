@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const information = document.createElement('div');
 
         information.className =
-        'rounded-xl border border-line bg-white/30 p-5 space-y-2';
+        'grid gap-x-8 gap-y-3 rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-sm)] sm:grid-cols-2';
 
         const fields = [
             ['Email', order.email],
@@ -41,10 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         fields.forEach(([label, value]) => {
-            const p = createText(
-                'p',
-                `${label}: ${value ?? '—'}`
-            );
+            const p = document.createElement('p');
+            p.className = 'border-b border-line pb-2 text-sm leading-6';
+            const title = createText('span', `${label}: `);
+            title.className = 'font-semibold text-ink/60';
+            p.append(title, document.createTextNode(value ?? '—'));
 
             information.append(p);
         });
@@ -55,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         status.id = 'currentStatus';
+        status.className =
+            'rounded-xl bg-[#fff7f9] px-3 py-2 text-sm font-bold sm:col-span-2';
 
         information.append(status);
 
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const table = document.createElement('table');
 
-        table.className = 'w-full text-left text-sm';
+        table.className = 'w-full min-w-[560px] text-left text-sm';
 
         const header = document.createElement('tr');
 
@@ -80,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Сума'
         ].forEach(value => {
             const th = createText('th', value);
-            th.className = 'p-3';
+            th.className = 'border-b border-line bg-[#fff7f9] px-4 py-3 text-xs font-bold uppercase tracking-wide text-ink/60';
             header.append(th);
         });
 
@@ -105,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             values.forEach(value => {
                 const cell = createText('td', value);
-                cell.className = 'p-3';
+                cell.className = 'border-t border-line px-4 py-3';
                 row.append(cell);
             });
 
@@ -114,7 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         table.append(thead, tbody);
 
-        root.append(heading, table);
+        const tableWrap = document.createElement('div');
+        tableWrap.className =
+            'overflow-x-auto rounded-2xl border border-line bg-surface shadow-[var(--shadow-sm)]';
+        tableWrap.append(table);
+        root.append(heading, tableWrap);
 
         const statusHeading = createText(
             'h2',
@@ -126,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const select = document.createElement('select');
 
         select.className =
-        'rounded-lg border border-line bg-white p-2';
+        'rounded-xl border border-line bg-surface px-3 py-2.5';
 
         ORDER_STATUSES.forEach(value => {
             select.add(new Option(value, value));
@@ -142,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.type = 'button';
 
         button.className =
-        'ml-3 rounded-lg bg-accent px-4 py-2 text-white';
+        'ml-3 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white';
 
         button.onclick = async () => {
             button.disabled = true;

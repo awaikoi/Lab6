@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('article');
 
         card.className =
-            'overflow-hidden rounded-xl border border-line bg-white/30 p-4';
+            'product-card group flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-line bg-surface p-3';
 
         const image = document.createElement('img');
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         image.alt = product.name;
 
         image.className =
-            'mb-3 h-48 w-full rounded-lg object-contain';
+            'h-52 w-full rounded-xl bg-[#f5f2ed] object-cover';
 
         if (!product.image_url) {
             image.classList.add('hidden');
@@ -45,15 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const name = document.createElement('h2');
         name.textContent = product.name;
-        name.className = 'font-semibold';
+        name.className = 'mt-4 px-1 text-base font-bold leading-6';
 
         const category = document.createElement('p');
         category.textContent =
             product.category_name || 'Без категорії';
 
-        category.className = 'text-xs text-ink/60';
+        category.className = 'mt-1 px-1 text-xs text-ink/50';
 
-        card.append(image, name, category);
+        card.append(image);
+
+        const discountWrap = document.createElement('div');
+        discountWrap.className = 'mt-3 flex min-h-7 items-center px-1';
 
         if (Number(product.discount_percent) > 0) {
             const oldPrice = document.createElement('p');
@@ -62,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `${product.price} грн`;
 
             oldPrice.className =
-                'text-sm line-through text-ink/50';
+                'mr-2 text-sm text-ink/40 line-through';
 
             const discount = document.createElement('span');
 
@@ -70,17 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 `-${product.discount_percent}%`;
 
             discount.className =
-                'rounded bg-accent px-2 py-1 text-white';
+                'rounded-md bg-accent px-2 py-1 text-[11px] font-bold text-white';
 
-            card.append(oldPrice, discount);
+            discountWrap.append(oldPrice, discount);
         }
+
+        card.append(name, category, discountWrap);
 
         const price = document.createElement('p');
 
         price.textContent =
             `${product.final_price} грн`;
 
-        price.className = 'my-3 font-bold';
+        price.className = 'mt-auto px-1 pb-3 text-xl font-bold';
 
         const button = document.createElement('button');
 
@@ -88,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         button.textContent = 'В кошик';
 
         button.className =
-            'rounded-lg bg-accent px-4 py-2 text-white';
+            'mt-1 w-full rounded-xl bg-accent px-4 py-3 text-sm font-bold text-white shadow-[0_6px_16px_rgba(136,19,55,.12)] hover:bg-[#9f1239]';
 
         button.addEventListener('click', () => {
             Cart.add(product.id);
@@ -107,9 +112,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPagination(meta) {
         pagination.replaceChildren();
 
+        pagination.className =
+            'mt-8 flex flex-wrap items-center justify-center gap-2';
+
         const previous = document.createElement('button');
         previous.textContent = '←';
         previous.disabled = page <= 1;
+        previous.className =
+            'h-10 min-w-10 rounded-xl border border-line bg-surface px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40';
 
         previous.onclick = () => {
             page--;
@@ -125,7 +135,11 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = i === page;
 
             button.className =
-                'rounded border border-line px-3 py-1';
+                `h-10 min-w-10 rounded-xl border px-3 text-sm font-semibold transition ${
+                    i === page
+                        ? 'border-accent bg-accent text-white'
+                        : 'border-line bg-surface text-ink/70 hover:border-accent/30 hover:text-accent'
+                }`;
 
             button.onclick = () => {
                 page = i;
@@ -139,6 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         next.textContent = '→';
         next.disabled = page >= meta.pages;
+        next.className =
+            'h-10 min-w-10 rounded-xl border border-line bg-surface px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40';
 
         next.onclick = () => {
             page++;

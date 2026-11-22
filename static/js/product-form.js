@@ -6,7 +6,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const category = form.elements.category_id;
     const preview = document.getElementById('imagePreview');
+    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+    const imageInput = form.elements.image;
+    const fileInput = form.elements.image_file;
     const errors = document.getElementById('formErrors');
+    let existingImageUrl = '';
+    let previewObjectUrl = '';
+
+    function showPreview(source) {
+        if (previewObjectUrl) {
+            URL.revokeObjectURL(previewObjectUrl);
+            previewObjectUrl = '';
+        }
+
+        preview.hidden = true;
+        preview.removeAttribute('src');
+
+        if (!source) {
+            previewPlaceholder.textContent = 'Зображення з’явиться тут';
+            previewPlaceholder.hidden = false;
+            return;
+        }
+
+        previewPlaceholder.textContent = 'Завантаження зображення…';
+        previewPlaceholder.hidden = false;
+
+        preview.onload = () => {
+            preview.hidden = false;
+            previewPlaceholder.hidden = true;
+        };
+
+        preview.onerror = () => {
+            preview.hidden = true;
+            previewPlaceholder.textContent =
+                'Не вдалося завантажити зображення. Перевірте файл або URL.';
+            previewPlaceholder.hidden = false;
+        };
+
+        preview.src = source;
+    }
+
+    function updatePreview() {
+        const file = fileInput.files[0];
+
+        if (file) {
+            if (file.size > 5 * 1024 * 1024 ||
+                !['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+                showPreview('');
+                previewPlaceholder.textContent =
+                    'Виберіть JPG, PNG, GIF або WEBP до 5 МБ.';
+                return;
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            showPreview(objectUrl);
+            previewObjectUrl = objectUrl;
+            return;
+        }
+
+        showPreview(imageInput.value.trim() || existingImageUrl);
+    }
 
     async function initialize() {
         const response = await apiFetch(
@@ -35,14 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
             product.discount_percent;
 
         form.elements.image.value = product.image || '';
+        existingImageUrl = product.image_url || '';
 
         category.value = product.category_id || '';
 
-        if (product.image_url) {
-            preview.src =
-                product.image_url + '?t=' + Date.now();
-        }
+        updatePreview();
     }
+
+    imageInput.addEventListener('input', updatePreview);
+    fileInput.addEventListener('change', updatePreview);
 
     form.addEventListener('submit', async event => {
         event.preventDefault();
